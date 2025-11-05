@@ -1,15 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: secure-shop-service
+  name: $APP_NAME
   namespace: secureapp
-  labels:
-    app: secure-shop
 spec:
-  type: LoadBalancer
   selector:
-    app: secure-shop
+    app: $APP_NAME
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8070
+  type: LoadBalancer
