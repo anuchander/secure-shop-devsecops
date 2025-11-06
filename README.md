@@ -978,6 +978,12 @@ docker --version
 sudo docker run hello-world
 ```
 
+### Create a folder for Sonar Data
+```bash
+sudo mkdir /opt/sonar-data/
+sudo chmod 755 /opt/sonar-data/
+```
+
 ### 🌐 Create Docker Network
 ```bash
 docker network create sonar-network
@@ -1003,6 +1009,7 @@ docker run -d --name sonar-db --network sonar-network \
 docker run -d --name sonar \
   --restart unless-stopped \
   -p 9000:9000 \
+  --user root \
   --network sonar-network \
   -e SONAR_JDBC_URL=jdbc:postgresql://sonar-db:5432/sonar \
   -e SONAR_JDBC_USERNAME=sonar \
