@@ -4,7 +4,7 @@ Report Summary
 ┌───────────────────────────────────────────────────────────────────────────┬────────┬─────────────────┬─────────┐
 │                                  Target                                   │  Type  │ Vulnerabilities │ Secrets │
 ├───────────────────────────────────────────────────────────────────────────┼────────┼─────────────────┼─────────┤
-│ 822654906952.dkr.ecr.us-east-1.amazonaws.com/secureshop:71 (alpine 3.7.0) │ alpine │       58        │    -    │
+│ 822654906952.dkr.ecr.us-east-1.amazonaws.com/secureshop:72 (alpine 3.7.0) │ alpine │       58        │    -    │
 ├───────────────────────────────────────────────────────────────────────────┼────────┼─────────────────┼─────────┤
 │ usr/app/shopping-cart-0.0.1-SNAPSHOT.jar                                  │  jar   │       120       │    -    │
 └───────────────────────────────────────────────────────────────────────────┴────────┴─────────────────┴─────────┘
@@ -22,7 +22,7 @@ Learn more and start using VEX: https://trivy.dev/v0.67/docs/supply-chain/vex/re
 To disable this notice, set the TRIVY_DISABLE_VEX_NOTICE environment variable.
 
 
-822654906952.dkr.ecr.us-east-1.amazonaws.com/secureshop:71 (alpine 3.7.0)
+822654906952.dkr.ecr.us-east-1.amazonaws.com/secureshop:72 (alpine 3.7.0)
 =========================================================================
 Total: 58 (HIGH: 43, CRITICAL: 15)
 
@@ -732,7 +732,7 @@ Report Summary
 ┌───────────────────────────────────────────────────────────────────────────┬────────┬─────────────────┬─────────┐
 │                                  Target                                   │  Type  │ Vulnerabilities │ Secrets │
 ├───────────────────────────────────────────────────────────────────────────┼────────┼─────────────────┼─────────┤
-│ 822654906952.dkr.ecr.us-east-1.amazonaws.com/secureshop:71 (alpine 3.7.0) │ alpine │       15        │    -    │
+│ 822654906952.dkr.ecr.us-east-1.amazonaws.com/secureshop:72 (alpine 3.7.0) │ alpine │       15        │    -    │
 ├───────────────────────────────────────────────────────────────────────────┼────────┼─────────────────┼─────────┤
 │ usr/app/shopping-cart-0.0.1-SNAPSHOT.jar                                  │  jar   │       41        │    -    │
 └───────────────────────────────────────────────────────────────────────────┴────────┴─────────────────┴─────────┘
@@ -750,7 +750,7 @@ Learn more and start using VEX: https://trivy.dev/v0.67/docs/supply-chain/vex/re
 To disable this notice, set the TRIVY_DISABLE_VEX_NOTICE environment variable.
 
 
-822654906952.dkr.ecr.us-east-1.amazonaws.com/secureshop:71 (alpine 3.7.0)
+822654906952.dkr.ecr.us-east-1.amazonaws.com/secureshop:72 (alpine 3.7.0)
 =========================================================================
 Total: 15 (CRITICAL: 15)
 
