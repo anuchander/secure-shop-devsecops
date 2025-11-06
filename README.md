@@ -1001,6 +1001,7 @@ docker run -d --name sonar-db --network sonar-network \
 ### 🚀 Run SonarQube (Persistent App Container)
 ```bash
 docker run -d --name sonar \
+  --restart unless-stopped \
   -p 9000:9000 \
   --network sonar-network \
   -e SONAR_JDBC_URL=jdbc:postgresql://sonar-db:5432/sonar \
