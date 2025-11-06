@@ -1134,17 +1134,17 @@ addonsConfig:
 ```
 ### 🧱 Save your cluster config file
 ```bash
-eks-cluster-config.yaml
+jenkins-eks-cluster.yaml
 ```
 
 ### 🧾 Validate your config
 ```bash
-eksctl utils validate cluster --config-file eks-cluster-config.yaml --region us-east-1
+eksctl utils validate cluster --config-file jenkins-eks-cluster.yaml --region us-east-1
 ```
 
 ### 🚀 Create the cluster
 ```bash
-eksctl create cluster -f eks-cluster-config.yaml
+eksctl create cluster -f jenkins-eks-cluster.yaml
 ```
 
 ### 🧩 Verify the cluster
