@@ -5,25 +5,15 @@
 
 ## 🧭 Table of Contents
 1. [Overview](#overview)
-2. [Prerequisites](#prerequisites)
-3. [Create a Custom VPC](#create-a-custom-vpc)
-4. [Launch a Bastion Host (Ubuntu EC2)](#launch-a-bastion-host-ubuntu-ec2)
-5. [Connect to the EC2 Instance](#connect-to-the-ec2-instance)
-6. [Install AWS CLI, eksctl, kubectl, and Helm](#install-aws-cli-eksctl-kubectl-and-helm)
-7. [Create an EKS Cluster](#create-an-eks-cluster)
-8. [Configure Node Groups](#configure-node-groups)
-9. [Set Up Storage Class for EBS](#set-up-storage-class-for-ebs)
-10. [Create Kubernetes Secrets](#create-kubernetes-secrets)
-11. [Deploy MySQL](#deploy-mysql)
-12. [Deploy WordPress](#deploy-wordpress)
-13. [Verify the Deployment](#verify-the-deployment)
-14. [Access the WordPress Application](#access-the-wordpress-application)
-15. [Optional Enhancements](#optional-enhancements)
-16. [Cleanup Resources](#cleanup-resources)
-17. [Delete EKS Cluster and Node Groups](#delete-eks-cluster-and-node-groups)
-18. [Delete EC2 and VPC Resources](#delete-ec2-and-vpc-resources)
-19. [Architecture Overview](#architecture-overview)
-20. [Summary](#summary)
+2. [Architecture Overview](#architecture-overview)
+3. [Tools and Technologies](#tools-and-technologies)
+4. [Create a Custom VPC](#create-a-custom-vpc)
+5. [Launch a Jenkins Server (Ubuntu EC2)](#launch-a-jenkins-server-ubuntu-ec2)
+6. [Login to Jenkins Server](#login-to-jenkins-server)
+7. [Launch a Nexus Server (Ubuntu EC2)](#launch-a-nexus-server-ubuntu-ec2)
+8. [Launch a SonarQube Server (Ubuntu EC2)](#launch-a-sonarqube-server-ubuntu-ec2)
+9. [Create an EKS Cluster](#create-an-eks-cluster)
+
 
 ---
 
@@ -40,7 +30,7 @@ You’ll learn how to automate the entire **build, testing, security scanning, c
 
 ## 🧰 Tools and Technologies
 
-Ensure you have the following tools installed and configured on your EC2 Server).
+Below are the tools and services used.
 
 | Tool | Description |
 |------|--------------|
@@ -144,7 +134,7 @@ $PUB_SUBNET1 = (aws ec2 create-subnet `
   --resources $PUB_SUBNET1 `
   --tags Key=Name,Value=PUB_SUBNET1 `
          Key=kubernetes.io/role/elb,Value=1 `
-         Key=kubernetes.io/cluster/wordpress-eks,Value=shared
+         Key=kubernetes.io/cluster/jenkins-secureapp,Value=shared
   aws ec2 modify-subnet-attribute --subnet-id $PUB_SUBNET1 --map-public-ip-on-launch
 
 # ✅ Public Subnet 2
@@ -158,7 +148,7 @@ $PUB_SUBNET2 = (aws ec2 create-subnet `
   --resources $PUB_SUBNET2 `
   --tags Key=Name,Value=PUB_SUBNET2 `
          Key=kubernetes.io/role/elb,Value=1 `
-         Key=kubernetes.io/cluster/wordpress-eks,Value=shared
+         Key=kubernetes.io/cluster/jenkins-secureapp,Value=shared
   aws ec2 modify-subnet-attribute --subnet-id $PUB_SUBNET2 --map-public-ip-on-launch
          
 # Private Subnets
@@ -173,7 +163,7 @@ $PRI_SUBNET1 = (aws ec2 create-subnet `
   --resources $PRI_SUBNET1 `
   --tags Key=Name,Value=PRI_SUBNET1 `
          Key=kubernetes.io/role/internal-elb,Value=1 `
-         Key=kubernetes.io/cluster/wordpress-eks,Value=shared
+         Key=kubernetes.io/cluster/jenkins-secureapp,Value=shared
 
 # ✅ Private Subnet 2
 $PRI_SUBNET2 = (aws ec2 create-subnet `
@@ -186,7 +176,7 @@ $PRI_SUBNET2 = (aws ec2 create-subnet `
   --resources $PRI_SUBNET2 `
   --tags Key=Name,Value=PRI_SUBNET2 `
          Key=kubernetes.io/role/internal-elb,Value=1 `
-         Key=kubernetes.io/cluster/wordpress-eks,Value=shared
+         Key=kubernetes.io/cluster/jenkins-secureapp,Value=shared
   
 Write-Host "✅ Public Subnets: $PUB_SUBNET1, $PUB_SUBNET2"
 Write-Host "✅ Private Subnets: $PRI_SUBNET1, $PRI_SUBNET2"
@@ -280,7 +270,7 @@ aws ec2 authorize-security-group-ingress `
 aws ec2 authorize-security-group-ingress `
   --group-id $SG_ID_3 `
   --protocol tcp `
-  --port 9090 `
+  --port 9000 `
   --cidr 0.0.0.0/0
 
 aws ec2 authorize-security-group-ingress `
@@ -331,7 +321,8 @@ PUB_SUBNET1=$(aws ec2 create-subnet \
   --resources $PUB_SUBNET1 \
   --tags 'Key=Name,Value=PUB_SUBNET1' \
          'Key=kubernetes.io/role/elb,Value=1' \
-         'Key=kubernetes.io/cluster/wordpress-eks,Value=shared'
+         'Key=kubernetes.io/cluster/jenkins-secureapp,Value=shared'
+  aws ec2 modify-subnet-attribute --subnet-id $PUB_SUBNET1 --map-public-ip-on-launch
 
 # ✅ Public Subnet 2
 PUB_SUBNET2=$(aws ec2 create-subnet \
@@ -345,8 +336,8 @@ PUB_SUBNET2=$(aws ec2 create-subnet \
   --resources $PUB_SUBNET2 \
   --tags 'Key=Name,Value=PUB_SUBNET2' \
          'Key=kubernetes.io/role/elb,Value=1' \
-         'Key=kubernetes.io/cluster/wordpress-eks,Value=shared'
-
+         'Key=kubernetes.io/cluster/jenkins-secureapp,Value=shared'
+  aws ec2 modify-subnet-attribute --subnet-id $PUB_SUBNET2 --map-public-ip-on-launch
 # Private Subnets
 # ✅ Private Subnet 1
 PRI_SUBNET1=$(aws ec2 create-subnet \
@@ -360,7 +351,7 @@ PRI_SUBNET1=$(aws ec2 create-subnet \
   --resources $PRI_SUBNET1 \
   --tags 'Key=Name,Value=PRI_SUBNET1' \
          'Key=kubernetes.io/role/internal-elb,Value=1' \
-         'Key=kubernetes.io/cluster/wordpress-eks,Value=shared'
+         'Key=kubernetes.io/cluster/jenkins-secureapp,Value=shared'
 
 
 # ✅ Private Subnet 2
@@ -375,7 +366,7 @@ PRI_SUBNET2=$(aws ec2 create-subnet \
   --resources $PRI_SUBNET2 \
   --tags 'Key=Name,Value=PRI_SUBNET2' \
          'Key=kubernetes.io/role/internal-elb,Value=1' \
-         'Key=kubernetes.io/cluster/wordpress-eks,Value=shared'
+         'Key=kubernetes.io/cluster/jenkins-secureapp,Value=shared'
 
 echo "✅ Public Subnets: $PUB_SUBNET1, $PUB_SUBNET2"
 echo "✅ Private Subnets: $PRI_SUBNET1, $PRI_SUBNET2"
@@ -467,7 +458,7 @@ aws ec2 authorize-security-group-ingress \
 aws ec2 authorize-security-group-ingress \
   --group-id $SG_ID \
   --protocol tcp \
-  --port 9090 \
+  --port 9000 \
   --cidr 0.0.0.0/0
   
  aws ec2 authorize-security-group-ingress \
@@ -546,7 +537,7 @@ $SONARQUBE_ID = (aws ec2 run-instances `
   --count 1 `
   --instance-type t3.medium `
   --key-name $KEY_NAME `
-  --security-group-ids $SG_ID_2 `
+  --security-group-ids $SG_ID_3 `
   --subnet-id $PUB_SUBNET1 `
   --associate-public-ip-address `
   --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=SonarQube-Server}]" `
@@ -742,7 +733,7 @@ sudo docker run hello-world
 ### 🧱 Install Jenkins on Linux
 ```bash
 # Install Java (required by Jenkins)
-sudo apt install -y fontconfig openjdk-17-jre
+sudo apt install -y fontconfig openjdk-21-jre
 
 # Add Jenkins repository and key
 curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
@@ -786,20 +777,15 @@ http://<your-ec2-public-ip>:8080
 *Use the above password to unlock Jenkins and install suggested plugins.*
 
 
-
-```
-
 ## 🔐 Login to Nexus Server
-
 After creating your Nexus EC2 instance, you can securely connect to it using the SSH key pair you generated earlier.
 
 First exit from the Jenkins Server and then login again to the Nexus Server
 
 ---
 
-### 💻 Windows PowerShell
-
 ```powershell
+### 💻 Windows PowerShell
 # Variables
 $NEXUS_IP = "YOUR_NEXUS_PUBLIC_IP"
 $KEY_NAME = "Jenkins-key"
@@ -814,7 +800,7 @@ ssh -i "$KEY_NAME.pem" ubuntu@$NEXUS_IP
 
 ### 🐧 Linux / 🧠 macOS
 
-```powershell
+```bash
 # Variables
 $NEXUS_IP = "YOUR_NEXUS_PUBLIC_IP"
 $KEY_NAME = "Jenkins-key"
@@ -847,7 +833,7 @@ sudo apt upgrade -y
 ```bash
 # Update system
 sudo apt update -y
-sudo apt install -y openjdk-17-jre wget tar
+sudo apt install -y openjdk-21-jre wget tar
 
 # Create Nexus user
 sudo useradd -M -d /opt/nexus -s /bin/bash nexus
@@ -934,7 +920,7 @@ ssh -i "$KEY_NAME.pem" ubuntu@$SONARQUBE_IP
 
 ### 🐧 Linux / 🧠 macOS
 
-```powershell
+```bash
 # Variables
 $SONARQUBE_IP = "YOUR_SONARQUBE_PUBLIC_IP"
 $KEY_NAME = "Jenkins-key"
@@ -1102,7 +1088,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: jenkins-eks
+  name: jenkins-secureapp
   region: us-east-1 # Must match your subnet AZs
   version: "1.33"   # Latest stable Kubernetes version
 
@@ -1185,13 +1171,17 @@ http://<your-ec2-public-ip>:8080
 ```bash
 1. SonarQube Scanner Plugin: Integrates Jenkins with SonarQube for code analysis.
 2. Nexus Artifact Uploader: Provides integration with Nexus Repository Manager for artifact management.
-3. OWASP Dependency-Check: Integrates OWASP ZAP for security scanning.
-4. Config File Provider: Ability to provide configuration file.(for nexus configuration).
-5. Eclipse Temurin installer: Provide an installer for the different JDK.
-6. Pipeline Maven Integration: Configure Maven integration with Pipeline.
-7. Kubernetes: Deploy Jenkins workloads (agents or jobs) to Kubernetes pods.
-8. Kubernetes CLI: Provides kubectl access inside pipelines.
-9. Amazon EKS: Adds native EKS integration (cluster management and credentials).
+3. OWASP Dependency-Check Plugin: Scans dependencies for known vulnerabilities using OWASP CVE data.
+4. Config File Provider: Supplies configuration files (e.g., settings.xml for Maven/Nexus) inside pipelines.
+5. Eclipse Temurin Installer: Provides an installer for different JDK versions.
+6. Pipeline Maven Integration: Enables Maven build and artifact management within Jenkins pipelines.
+7. Kubernetes Plugin: Deploys Jenkins workloads (agents or jobs) to Kubernetes pods.
+8. Kubernetes CLI Plugin: Provides kubectl access directly inside Jenkins pipelines.
+9. Amazon EKS Plugin: Adds native EKS integration for cluster management and deployments.
+10. Amazon ECR Plugin: Enables Docker image push/pull with AWS Elastic Container Registry.
+11. AWS Credentials Plugin: Manages AWS access keys and roles within Jenkins.
+12. Docker Plugin: Builds, tags, and pushes Docker images during CI/CD pipelines.
+13. Git & GitHub Plugins: Integrate Jenkins with Git/GitHub for SCM, commits, and webhooks.
 ```
 ### Grant Jenkins User Access to AWS CLI & EKS (kubectl)
 🧩 Switch to Root
@@ -1247,4 +1237,3 @@ Then restart Jenkins:
 ```bash
 sudo systemctl restart jenkins
 ```
-
