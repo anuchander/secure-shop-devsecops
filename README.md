@@ -1226,7 +1226,7 @@ The kubectl get nodes lists EKS worker nodes.
 
 🧱 5️⃣ Ensure Jenkins Has PATH to AWS & kubectl
 Sometimes Jenkins doesn’t inherit the full environment.
-*Add this to /etc/profile.d/jenkins-path.sh:*
+
 ```bash
 sudo tee /etc/profile.d/jenkins-path.sh > /dev/null <<'EOF'
 export PATH=$PATH:/usr/local/bin
