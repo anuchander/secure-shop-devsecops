@@ -1056,6 +1056,7 @@ docker rm -f sonar sonar-db
 # Variables
 REGION="us-east-1"
 VPC_NAME="Jenkins-EKS"
+ECR_APP_NAME="secureshop"
 
 # Get VPC ID
 VPC_ID=$(aws ec2 describe-vpcs \
