@@ -8,8 +8,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>shopping-cart</name>
-    <description>Demo project for Spring Boot Shopping Cart</description>
+    <name>DevOps Testing Project</name>
+    <description>DevOps testing project for Spring Boot Shopping Cart</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
