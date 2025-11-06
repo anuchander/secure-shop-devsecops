@@ -24,7 +24,7 @@ You’ll learn how to automate the entire **build, testing, security scanning, c
 
 ## 🏗️ Architecture Overview
 
-[![Architecture](https://k8s-help-cicd.s3.us-east-1.amazonaws.com/Screenshot_11.jpg "Architecture")](https://k8s-help-cicd.s3.us-east-1.amazonaws.com/Screenshot_11.jpg "Architecture")
+![architecture](images/architecture.jpg)
 
 ---
 
