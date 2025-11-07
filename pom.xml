@@ -9,7 +9,7 @@
     <packaging>jar</packaging>
 
     <name>DevOps Testing Project</name>
-    <description>DevOps testing project for Spring Boot Shopping Cart</description>
+    <description>DevOps testing project for Spring Boot Shopping Cart.</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
