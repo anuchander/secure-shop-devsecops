@@ -1268,3 +1268,24 @@ Then restart Jenkins:
 ```bash
 sudo systemctl restart jenkins
 ```
+## Configuration Screenshots in Jenkins
+
+![newitems](images/newitems.jpg)
+![Project](images/Project.jpg)
+![configure](images/configure.jpg)
+![credentials 1](images/credentials-1.jpg)
+![credentials](images/credentials.jpg)
+![settings](images/settings.jpg)
+![tools](images/tools.jpg)
+![global config](images/global-config.jpg)
+![maven global settings](images/maven-gloval-settings.jpg)
+![maven settings](images/maven-settings.jpg)
+![DC install](images/DC-install.jpg)
+![git location](images/git-location.jpg)
+![jenkins url](images/jenkins-url.jpg)
+![reload](images/reload.jpg)
+![sonarscanner](images/sonarscanner.jpg)
+![sonarqube details](images/sonarqube-details.jpg)
+![token create](images/token-create.jpg)
+![gitwebhook](images/gitwebhook.jpg)
+![webhook 1](images/webhook-1.jpg)
