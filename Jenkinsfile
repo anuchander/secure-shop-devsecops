@@ -13,14 +13,14 @@ pipeline {
     
         // Tools and integrations
         SCANNER_HOME = tool 'SonarScanner'
-        SONARQUBE = credentials('sonar-token')
+        SONARQUBE = credentials('sonarqube-jenkins-token')
 
         // OWASP API KEY
-        NVD_API_KEY = credentials('nvd-api-key')
+        //NVD_API_KEY = credentials('nvd-api-key')
 
         // AWS ECR configuration
         AWS_REGION = 'us-east-1'
-        AWS_ACCOUNT_ID = '822654906952'
+        AWS_ACCOUNT_ID = '593123425349'
         ECR_REPO_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         ECR_APP_NAME = 'secureshop'
         IMAGE_REPO = "${ECR_REPO_URL}/${ECR_APP_NAME}"
@@ -37,8 +37,8 @@ pipeline {
         checkout([$class: 'GitSCM',
             branches: [[name: 'main']],
             userRemoteConfigs: [[
-                url: 'https://github.com/sudhancicd/secure-shop-devsecops.git',
-                credentialsId: 'github-ssh-key'
+                url: 'https://github.com/anuchander/secure-shop-devsecops.git',
+                credentialsId: 'git-ssh-key'
             ]]
         ])
     }
@@ -72,7 +72,7 @@ pipeline {
                                 -Dsonar.sources=src \
                                 -Dsonar.java.binaries=target/classes \
                                 -Dsonar.sourceEncoding=UTF-8 \
-                                -Dsonar.host.url=http://98.84.135.194:9000 \
+                                -Dsonar.host.url=http://98.92.210.30:9000 \
                                 -Dsonar.login=$SONARQUBE
                         '''
                     }
@@ -109,7 +109,7 @@ pipeline {
                     IMAGE_TAG = "${BUILD_NUMBER ?: 'latest'}"
                     echo "Building Docker image: ${IMAGE_REPO}:${IMAGE_TAG}"
 
-                    withAWS(region: "${AWS_REGION}", credentials: 'aws-creds') {
+                    withAWS(region: "${AWS_REGION}", credentials: 'aws-eks') {
                         sh """
                             aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO_URL}
                             docker build -t ${ECR_APP_NAME}:${IMAGE_TAG} .
@@ -142,7 +142,7 @@ stage('K8S Deploy') {
             // Set environment variables for deployment
             def appName = 'secureshop'
             def awsRegion = 'us-east-1'
-            def awsAccount = '822654906952'
+            def awsAccount = '593123425349'
             def imageRepo = "${awsAccount}.dkr.ecr.${awsRegion}.amazonaws.com/${appName}"
             def imageTag = "${BUILD_NUMBER ?: 'latest'}"
 
@@ -178,12 +178,12 @@ stage('K8S Deploy') {
         stage('Commit Version Update') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'github-ssh-token', variable: 'GITHUB_TOKEN')]) { // Replace with the ID of the GitHub token credentials
-                        sh 'git config user.email "sudhan@ci-cd.org"'
-                        sh 'git config user.name "sudhancicd"'
+                    withCredentials([string(credentialsId: 'git-ssh-token', variable: 'GITHUB_TOKEN')]) { // Replace with the ID of the GitHub token credentials
+                        sh 'git config user.email "anuchander@gmail.com"'
+                        sh 'git config user.name "anuchander"'
 						
 						// Replace with the URL of your Git repository
-                        sh "git remote set-url origin https://$GITHUB_TOKEN:x-oauth-basic@github.com/sudhancicd/secure-shop-devsecops.git" 
+                        sh "git remote set-url origin https://$GITHUB_TOKEN:x-oauth-basic@github.com/anuchander/secure-shop-devsecops.git" 
 						
 						//Clean workspace before rebase
 						sh 'git reset --hard'
@@ -193,7 +193,7 @@ stage('K8S Deploy') {
                         sh 'git add .'
                         sh 'git commit -m "ci: version bump [skip ci]" || echo "No changes to commit"'
                         sh 'git push origin HEAD:main'
-						sh 'git config user.email "sudhan@ci-cd.org"'
+						sh 'git config user.email "anuchander@gmail.com"'
 
 
                     }
