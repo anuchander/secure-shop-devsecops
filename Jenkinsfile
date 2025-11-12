@@ -87,20 +87,23 @@ pipeline {
                 }
 
         stage('Artifact storing in Nexus') {
-            steps {
-                echo '📦 Publishing Artifact to Nexus Repository...'
-                script {
-                    withMaven(
-                        globalMavenSettingsConfig: 'global-maven-settings',
-                        jdk: 'jdk21',
-                        maven: 'maven3',
-                        traceability: true
-                    ) {
-                        sh 'mvn clean deploy -DskipTests=true'
-                    }
+    		steps {
+        		echo '📦 Publishing Artifact to Nexus Repository...'
+        		script {
+            		withCredentials([usernamePassword(credentialsId: 'nexus-cred', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                	withMaven(
+                    globalMavenSettingsConfig: 'global-maven-settings',
+                    jdk: 'jdk21',
+                    maven: 'maven3',
+                    traceability: true
+                ) {
+                    sh 'mvn clean deploy -DskipTests=true'
                 }
             }
         }
+    }
+}
+
 
         stage('Build Container Image & Push to ECR') {
             steps {
