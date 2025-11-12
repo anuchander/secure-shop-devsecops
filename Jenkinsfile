@@ -130,6 +130,8 @@ pipeline {
                 script {
                     echo '🔍 Scanning Docker image with Trivy...'
                     sh """
+						export TRIVY_CACHE_DIR=/home/trivy-cache
+            			mkdir -p $TRIVY_CACHE_DIR
                         trivy image --exit-code 0 --severity HIGH,CRITICAL ${IMAGE_REPO}:${IMAGE_TAG} > trivy-report.txt
                         trivy image --exit-code 1 --severity CRITICAL ${IMAGE_REPO}:${IMAGE_TAG} >> trivy-report.txt || true
                     """
