@@ -129,12 +129,16 @@ stage('Trivy Image Scan') {
     steps {
         echo '🔍 Scanning Docker image with Trivy...'
         script {
-            withEnv(["TRIVY_CACHE_DIR=/var/trivy-cache"]) {
+            withEnv([
+                "TRIVY_CACHE_DIR=/var/trivy-cache",
+                "TMPDIR=/var/trivy-cache/tmp"
+            ]) {
                 sh '''
                     mkdir -p $TRIVY_CACHE_DIR
+                    mkdir -p $TMPDIR
                     echo "📥 Caching directory: $TRIVY_CACHE_DIR"
-                    
-                    # Run Trivy scan and generate reports
+                    echo "📥 Temp directory: $TMPDIR"
+
                     trivy image --exit-code 0 --severity HIGH,CRITICAL ${IMAGE_REPO}:${IMAGE_TAG} > trivy-report.txt
                     trivy image --exit-code 1 --severity CRITICAL ${IMAGE_REPO}:${IMAGE_TAG} >> trivy-report.txt || true
                 '''
@@ -144,6 +148,7 @@ stage('Trivy Image Scan') {
         }
     }
 }
+
 
 
 
