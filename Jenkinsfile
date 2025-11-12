@@ -125,21 +125,26 @@ pipeline {
             }
         }
 
-        stage('Trivy Image Scan') {
-            steps {
-                script {
-                    echo '🔍 Scanning Docker image with Trivy...'
-                    sh """
-						export TRIVY_CACHE_DIR=/home/trivy-cache
-            			mkdir -p $TRIVY_CACHE_DIR
-                        trivy image --exit-code 0 --severity HIGH,CRITICAL ${IMAGE_REPO}:${IMAGE_TAG} > trivy-report.txt
-                        trivy image --exit-code 1 --severity CRITICAL ${IMAGE_REPO}:${IMAGE_TAG} >> trivy-report.txt || true
-                    """
-                    archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
-                    echo '✅ Trivy scan completed and report archived.'
-                }
+    stage('Trivy Image Scan') {
+    	steps {
+        	echo '🔍 Scanning Docker image with Trivy...'
+        	script {
+            	withEnv(["TRIVY_CACHE_DIR=/home/trivy-cache"]) {
+                sh '''
+                    mkdir -p $TRIVY_CACHE_DIR
+                    echo "📥 Caching directory: $TRIVY_CACHE_DIR"
+                    
+                    # Run Trivy scan and generate reports
+                    trivy image --exit-code 0 --severity HIGH,CRITICAL ${IMAGE_REPO}:${IMAGE_TAG} > trivy-report.txt
+                    trivy image --exit-code 1 --severity CRITICAL ${IMAGE_REPO}:${IMAGE_TAG} >> trivy-report.txt || true
+                '''
             }
+            archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
+            echo '✅ Trivy scan completed and report archived.'
         }
+    }
+}
+
 
 stage('K8S Deploy') {
     steps {
