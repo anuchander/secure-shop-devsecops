@@ -125,11 +125,11 @@ pipeline {
             }
         }
 
-    stage('Trivy Image Scan') {
-    	steps {
-        	echo '🔍 Scanning Docker image with Trivy...'
-        	script {
-            	withEnv(["TRIVY_CACHE_DIR=/home/trivy-cache"]) {
+stage('Trivy Image Scan') {
+    steps {
+        echo '🔍 Scanning Docker image with Trivy...'
+        script {
+            withEnv(["TRIVY_CACHE_DIR=/var/trivy-cache"]) {
                 sh '''
                     mkdir -p $TRIVY_CACHE_DIR
                     echo "📥 Caching directory: $TRIVY_CACHE_DIR"
@@ -144,6 +144,7 @@ pipeline {
         }
     }
 }
+
 
 
 stage('K8S Deploy') {
