@@ -194,7 +194,7 @@ stage('K8S Deploy') {
         stage('Commit Version Update') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'git-ssh-key', variable: 'GITHUB_TOKEN')]) { // Replace with the ID of the GitHub token credentials
+                    withCredentials([string(credentialsId: 'github-fine-token', variable: 'GITHUB_TOKEN')]) { // Replace with the ID of the GitHub token credentials
                         sh 'git config user.email "anuchander@gmail.com"'
                         sh 'git config user.name "anuchander"'
 						
